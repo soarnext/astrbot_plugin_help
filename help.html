@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/harmonyos-sans@1.0.0/harmonyos-sans.css">
+    <style>
+        :root {
+            --primary-color: #005ab4;
+            --bg-start: #f8faff;
+            --bg-end: #fffcf8;
+            --text-main: #333;
+            --text-header: #002864;
+            --card-bg: #ffffff;
+            --card-border: #dce1eb;
+        }
+        body {
+            font-family: 'HarmonyOS Sans SC', 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            margin: 0;
+            padding: 30px;
+            color: var(--text-main);
+            width: 800px;
+            box-sizing: border-box;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .logo {
+            width: 70px;
+            height: 70px;
+            margin-right: 25px;
+            border-radius: 15px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .header-text h1 {
+            margin: 0;
+            font-size: 32px;
+            color: var(--text-header);
+            letter-spacing: 1px;
+        }
+        .header-text p {
+            margin: 8px 0 0;
+            font-size: 18px;
+            color: #555;
+        }
+        .plugin-section {
+            margin-bottom: 35px;
+        }
+        .plugin-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #003c82;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 6px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        .commands-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+        .command-card {
+            background: var(--card-bg);
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .command-name {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0a468c;
+            word-break: break-all;
+        }
+        .command-desc {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 13px;
+            color: #888;
+            padding: 25px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #eef2f7;
+            color: #5c6b80;
+            font-size: 11px;
+            margin-left: 10px;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            {% if logo_base64 %}
+                {% if logo_base64.startswith('http') %}
+                <img src="{{ logo_base64 }}" class="logo">
+                {% else %}
+                <img src="data:image/jpeg;base64,{{ logo_base64 }}" class="logo">
+                {% endif %}
+            {% endif %}
+            <div class="header-text">
+                <h1>{{ help_title }}</h1>
+                {% if help_subtitle %}
+                <p>{{ help_subtitle }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% for plugin in plugins %}
+        <div class="plugin-section">
+            <div class="plugin-name">
+                {{ plugin.name }}
+                <span class="tag">{{ plugin.commands|length }} 个指令</span>
+            </div>
+            <div class="commands-grid">
+                {% for cmd in plugin.commands %}
+                <div class="command-card">
+                    <div class="command-name">{{ cmd.name }}</div>
+                    {% if cmd.desc %}
+                    <div class="command-desc">{{ cmd.desc }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="footer">
+            Powered by AstrBot & xiro • Generated at {{ time }}
+        </div>
+    </div>
+</body>
+</html>

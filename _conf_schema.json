@@ -1,0 +1,53 @@
+{
+    "help_title": {
+        "description": "帮助菜单标题",
+        "type": "string",
+        "default": "AstrBot 帮助菜单"
+    },
+    "help_subtitle": {
+        "description": "帮助菜单副标题",
+        "hint": "如果为空，则自动排版（隐藏副标题）。",
+        "type": "string",
+        "default": ""
+    },
+    "admin_help_title": {
+        "description": "管理员帮助菜单标题",
+        "type": "string",
+        "default": "AstrBot 管理员控制台"
+    },
+    "admin_help_subtitle": {
+        "description": "管理员帮助菜单副标题",
+        "type": "string",
+        "default": "这里是系统管理员的专属功能"
+    },
+    "help_avatar": {
+        "description": "帮助菜单头像",
+        "hint": "上传一张图片作为头像。如果不上传，则使用默认头像。",
+        "type": "file",
+        "file_types": ["png", "jpg", "jpeg", "webp"],
+        "default": []
+    },
+    "show_builtin_cmds": {
+        "description": "显示内部指令",
+        "type": "bool",
+        "default": false
+    },
+    "custom_cmds": {
+        "description": "自定义的额外命令",
+        "hint": "一些通过正则或者监听器形成的命令无法检测，可通过自定义方式补充，格式为“命令: 一段描述”，分隔符为英文逗号或#",
+        "type": "list",
+        "default": []
+    },
+    "plugin_blacklist": {
+        "description": "插件黑名单",
+        "hint": "填写插件名称(区分大小写)，如：astrbot_plugin_help，黑名单里的插件不显示帮助",
+        "type": "list",
+        "default": ["builtin_commands"]
+    },
+    "plugin_name_map": {
+        "description": "插件显示名称映射",
+        "hint": "将插件的原始名称映射为自定义显示名称。格式为：'原始插件名: 自定义显示名'，每行一个。例如：'astrbot_plugin_help: 帮助菜单'",
+        "type": "list",
+        "default": []
+    }
+}
