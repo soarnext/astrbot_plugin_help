@@ -129,12 +129,12 @@ class MyPlugin(Star):
 
         # 渲染 HTML 转图片
         # 按照文档说明，使用 self.html_render
-        help_name = self.config.get("help_name", "AstrBot")
+        bot_name = self.config.get("bot_name", "AstrBot")
         if is_admin:
-            help_title = f"{help_name}管理帮助文档"
-            help_subtitle = self.config.get("admin_help_subtitle", "这里是系统管理员的专属功能")
+            help_title = f"{bot_name}管理帮助文档"
+            help_subtitle = self.config.get("admin_help_subtitle", "")
         else:
-            help_title = f"{help_name}帮助文档"
+            help_title = f"{bot_name}帮助文档"
             help_subtitle = self.config.get("help_subtitle", "")
 
         render_data = {
