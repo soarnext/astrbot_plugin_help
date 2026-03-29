@@ -10,7 +10,7 @@ _✨ 高颜值、自动化的 [AstrBot](https://github.com/Soulter/AstrBot) 帮�
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![AstrBot](https://img.shields.io/badge/AstrBot-3.4%2B-orange.svg)](https://github.com/Soulter/AstrBot)
 [![Author](https://img.shields.io/badge/作者-xiro-blue)](https://github.com/soarnext)
-[![Version](https://img.shields.io/badge/版本-v1.0.2-red)](https://github.com/soarnext/astrbot_plugin_help)
+[![Version](https://img.shields.io/badge/版本-v1.0.2-red)](https://github.com/soarnext/astrbot_plugin_xirohelp)
 
 </div>
 
@@ -31,7 +31,7 @@ _✨ 高颜值、自动化的 [AstrBot](https://github.com/Soulter/AstrBot) 帮�
 2. 或手动安装：
    ```bash
    cd /path/to/AstrBot/data/plugins
-   git clone https://github.com/soarnext/astrbot_plugin_help
+   git clone https://github.com/soarnext/astrbot_plugin_xirohelp
    ```
 3. 重启 AstrBot 即可生效。
 
@@ -62,4 +62,4 @@ _✨ 高颜值、自动化的 [AstrBot](https://github.com/Soulter/AstrBot) 帮�
 [MIT License](LICENSE)
 
 ---
-[帮助文档](https://astrbot.app) | [GitHub 仓库](https://github.com/soarnext/astrbot_plugin_help)
+[帮助文档](https://astrbot.app) | [GitHub 仓库](https://github.com/soarnext/astrbot_plugin_xirohelp)
