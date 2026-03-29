@@ -163,8 +163,9 @@ class MyPlugin(Star):
         """获取所有其他插件及其命令列表, 格式为 {plugin_name: [command#desc]}"""
         plugin_commands: Dict[str, List[str]] = collections.defaultdict(list)
         
-        # 获取管理员指令设置
-        admin_commands_list = self.config.get("admin_commands", ["plugin", "llm", "ascmd", "debug", "conf", "ct", "help", "adminhelps"])
+        # 获取管理员和用户指令强制设置
+        admin_commands_list = self.config.get("admin_commands", [])
+        user_commands_list = self.config.get("user_commands", [])
         
         # 获取插件显示名称映射
         name_map = {}
@@ -211,23 +212,40 @@ class MyPlugin(Star):
                     
                 command_name: Optional[str] = None
                 description: Optional[str] = handler.desc
+                is_admin_auto = False
                 
                 for filter_ in handler.event_filters:
                     if isinstance(filter_, CommandFilter):
                         command_name = filter_.command_name
                     elif isinstance(filter_, CommandGroupFilter):
                         command_name = filter_.group_name
+                    else:
+                        # 自动判断：动态判断是否为权限过滤器
+                        p_type = getattr(filter_, "permission_type", None)
+                        if p_type is not None and str(p_type).endswith(".ADMIN"):
+                            is_admin_auto = True
+                        elif hasattr(filter_, "permission_type") and p_type == filter.PermissionType.ADMIN:
+                            is_admin_auto = True
                         
                 if command_name:
-                    # 严格分离：根据 admin_commands 列表进行手动分类
-                    is_admin_cmd = command_name in admin_commands_list
+                    # 自动标记：包含 (admin)
+                    if description and "(admin)" in description:
+                        is_admin_auto = True
+                        
+                    # 最终判断：手动强制设置优先级最高，自动识别作为基础
+                    if command_name in admin_commands_list:
+                        is_admin_cmd = True
+                    elif command_name in user_commands_list:
+                        is_admin_cmd = False
+                    else:
+                        is_admin_cmd = is_admin_auto
                     
                     if is_admin:
-                        # 管理员帮助：仅显示在 admin_commands 列表中的指令
+                        # 管理员帮助：仅显示管理员指令
                         if not is_admin_cmd:
                             continue
                     else:
-                        # 普通帮助：仅显示不在 admin_commands 列表中的指令
+                        # 普通帮助：仅显示非管理员指令
                         if is_admin_cmd:
                             continue
                         
@@ -240,8 +258,9 @@ class MyPlugin(Star):
         commands = []
         lines = text_list.strip().splitlines() if isinstance(text_list, str) else [ln for ln in text_list if ln.strip()]
         
-        # 获取管理员指令设置
-        admin_commands_list = self.config.get("admin_commands", ["plugin", "llm", "ascmd", "debug", "conf", "ct", "help", "adminhelps"])
+        # 获取管理员和用户指令强制设置
+        admin_commands_list = self.config.get("admin_commands", [])
+        user_commands_list = self.config.get("user_commands", [])
 
         for line in lines:
             raw = line
@@ -267,8 +286,16 @@ class MyPlugin(Star):
                 cmd = stripped[2:].strip() if stripped.startswith("- ") else stripped
                 desc = None
                 
-            # 管理员指令过滤逻辑
-            is_admin_cmd = cmd in admin_commands_list
+            # 自动标记：包含 (admin)
+            is_admin_auto = "(admin)" in stripped
+            
+            # 最终判断：手动强制设置优先级最高，自动识别作为基础
+            if cmd in admin_commands_list:
+                is_admin_cmd = True
+            elif cmd in user_commands_list:
+                is_admin_cmd = False
+            else:
+                is_admin_cmd = is_admin_auto
             
             if is_admin:
                 # 管理员帮助：仅显示管理员指令

@@ -49,8 +49,14 @@
     },
     "admin_commands": {
         "description": "管理员指令列表",
-        "hint": "手动指定哪些指令属于管理员指令（不显示在普通帮助中）。填写指令名，如：plugin, llm",
+        "hint": "手动【强制】将指令设为管理员指令。填写指令名，如：plugin, llm",
         "type": "list",
-        "default": ["plugin", "llm", "ascmd", "debug", "conf", "ct", "help", "adminhelps"]
+        "default": []
+    },
+    "user_commands": {
+        "description": "普通指令列表",
+        "hint": "手动【强制】将指令设为普通指令（即便它带有 admin 标记）。填写指令名，如：help",
+        "type": "list",
+        "default": []
     }
 }
