@@ -1,19 +1,15 @@
 {
-    "help_title": {
-        "description": "帮助菜单标题",
+    "help_name": {
+        "description": "帮助菜单名称",
+        "hint": "将自动生成 <名称>帮助文档 或 <名称>管理帮助文档",
         "type": "string",
-        "default": "AstrBot 帮助菜单"
+        "default": "AstrBot"
     },
     "help_subtitle": {
         "description": "帮助菜单副标题",
         "hint": "如果为空，则自动排版（隐藏副标题）。",
         "type": "string",
         "default": ""
-    },
-    "admin_help_title": {
-        "description": "管理员帮助菜单标题",
-        "type": "string",
-        "default": "AstrBot 管理员控制台"
     },
     "admin_help_subtitle": {
         "description": "管理员帮助菜单副标题",
@@ -30,7 +26,7 @@
     "show_builtin_cmds": {
         "description": "显示内部指令",
         "type": "bool",
-        "default": false
+        "default": true
     },
     "custom_cmds": {
         "description": "自定义的额外命令",

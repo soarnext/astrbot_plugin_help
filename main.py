@@ -129,11 +129,12 @@ class MyPlugin(Star):
 
         # 渲染 HTML 转图片
         # 按照文档说明，使用 self.html_render
+        help_name = self.config.get("help_name", "AstrBot")
         if is_admin:
-            help_title = self.config.get("admin_help_title", "AstrBot 管理员控制台")
+            help_title = f"{help_name}管理帮助文档"
             help_subtitle = self.config.get("admin_help_subtitle", "这里是系统管理员的专属功能")
         else:
-            help_title = self.config.get("help_title", "AstrBot 帮助菜单")
+            help_title = f"{help_name}帮助文档"
             help_subtitle = self.config.get("help_subtitle", "")
 
         render_data = {
@@ -288,7 +289,7 @@ class MyPlugin(Star):
 
     def _parse_plugin_commands_sorted_grouped(self, plugin_dict: Dict[str, Any], is_admin: bool = True) -> List[Tuple[str, List[Tuple[str, str | None]]]]:
         # 是否显示内置指令
-        show_builtin = self.config.get("show_builtin_cmds", False)
+        show_builtin = self.config.get("show_builtin_cmds", True)
         if show_builtin:
             built_in_list = self._parse_single_command_list(self.BUILT_IN_COMMANDS_TEXT, is_admin)
             built_in_plugin = ("内部指令", built_in_list) if built_in_list else None
