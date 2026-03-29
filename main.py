@@ -16,7 +16,7 @@ from astrbot.core.star.star_handler import star_handlers_registry, StarHandlerMe
 
 
 @register(
-    "astrbot_plugin_xirohelp", "xiro", "查看所有命令，包括插件，返回一张帮助图片", "1.0.3"
+    "astrbot_plugin_xirohelp", "xiro", "查看所有命令，包括插件，返回一张帮助图片", "1.0.2"
 )
 class MyPlugin(Star):
     # 内置指令文本，带 (admin) 标记的仅管理员可见
