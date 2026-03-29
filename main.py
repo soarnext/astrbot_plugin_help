@@ -49,7 +49,7 @@ def get_image_data_uri(path_str: str, base_dir: Path, plugin_data_dir: Path, is_
 
 
 @register(
-    "astrbot_plugin_xirohelp", "xiro", "查看所有命令，包括插件，返回一张帮助图片", "1.0.4"
+    "astrbot_plugin_xirohelp", "xiro", "查看所有命令，包括插件，返回一张帮助图片", "1.0.5"
 )
 class MyPlugin(Star):
     # 内置指令文本，带 (admin) 标记的仅管理员可见
@@ -94,7 +94,17 @@ class MyPlugin(Star):
         self.logo_path = os.path.join(os.path.dirname(__file__), "astrbot_logo.jpg")
         self.template_path = Path(__file__).parent / "help.html"
         self.base_dir = Path(os.getcwd())
-        self.plugin_data_dir = Path(self.context.get_data_dir())
+        
+        # 修复: 尝试从 context 获取数据目录，如果失败则回退到当前目录
+        try:
+            # AstrBot v3.x+ 通常在 context.data_dir
+            data_dir = getattr(self.context, "data_dir", None)
+            if not data_dir:
+                # 尝试 context.get_data_dir() 但已知失败，所以这里仅作为备选逻辑
+                data_dir = os.getcwd()
+            self.plugin_data_dir = Path(data_dir)
+        except:
+            self.plugin_data_dir = Path(os.getcwd())
         
         # 配置校验和初始化
         bot_name = self.config.get("bot_name")
