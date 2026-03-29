@@ -10,7 +10,7 @@ _✨ 高颜值、自动化的 [AstrBot](https://github.com/Soulter/AstrBot) 帮�
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![AstrBot](https://img.shields.io/badge/AstrBot-3.4%2B-orange.svg)](https://github.com/Soulter/AstrBot)
 [![Author](https://img.shields.io/badge/作者-xiro-blue)](https://github.com/soarnext)
-[![Version](https://img.shields.io/badge/版本-v1.0.2-red)](https://github.com/soarnext/astrbot_plugin_xirohelp)
+[![Version](https://img.shields.io/badge/版本-v1.0.3-red)](https://github.com/soarnext/astrbot_plugin_xirohelp)
 
 </div>
 

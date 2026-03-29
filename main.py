@@ -16,7 +16,7 @@ from astrbot.core.star.star_handler import star_handlers_registry, StarHandlerMe
 
 
 @register(
-    "astrbot_plugin_xirohelp", "xiro", "查看所有命令，包括插件，返回一张帮助图片", "1.0.2"
+    "astrbot_plugin_xirohelp", "xiro", "查看所有命令，包括插件，返回一张帮助图片", "1.0.3"
 )
 class MyPlugin(Star):
     # 内置指令文本，带 (admin) 标记的仅管理员可见
@@ -105,23 +105,28 @@ class MyPlugin(Star):
             
         if avatar_path and isinstance(avatar_path, str):
             if avatar_path.startswith(("http://", "https://")):
-                # 如果是网络图片，我们不能直接读取文件，但在 HTML 模板中可以直接使用 URL
-                # 为了保持逻辑一致，我们这里如果是 URL 就直接把 URL 给 logo_base64，模板里需要适配
                 logo_base64 = avatar_path
-            elif os.path.exists(avatar_path):
-                with open(avatar_path, "rb") as f:
-                    logo_base64 = base64.b64encode(f.read()).decode("utf-8")
             else:
-                # 尝试作为相对路径
-                relative_path = os.path.join(os.path.dirname(__file__), avatar_path)
-                if os.path.exists(relative_path):
-                    with open(relative_path, "rb") as f:
-                        logo_base64 = base64.b64encode(f.read()).decode("utf-8")
+                # 尝试多个路径：绝对路径、相对插件目录、相对运行目录
+                paths_to_try = [
+                    avatar_path,
+                    os.path.join(os.path.dirname(__file__), avatar_path),
+                    os.path.abspath(avatar_path)
+                ]
+                for p in paths_to_try:
+                    if os.path.exists(p) and os.path.isfile(p):
+                        with open(p, "rb") as f:
+                            encoded = base64.b64encode(f.read()).decode("utf-8")
+                            ext = os.path.splitext(p)[1].lower().strip(".")
+                            mime = f"image/{ext}" if ext in ["png", "jpg", "jpeg", "webp"] else "image/jpeg"
+                            logo_base64 = f"data:{mime};base64,{encoded}"
+                            break
         
         # 如果没有配置头像或读取失败，使用默认 logo
         if not logo_base64 and os.path.exists(self.logo_path):
             with open(self.logo_path, "rb") as f:
-                logo_base64 = base64.b64encode(f.read()).decode("utf-8")
+                encoded = base64.b64encode(f.read()).decode("utf-8")
+                logo_base64 = f"data:image/jpeg;base64,{encoded}"
 
         # 读取 HTML 模板
         with open(self.template_path, "r", encoding="utf-8") as f:
@@ -141,7 +146,7 @@ class MyPlugin(Star):
             "help_title": help_title,
             "help_subtitle": help_subtitle,
             "plugins": plugins_data,
-            "logo_base64": logo_base64,
+            "logo_base64": logo_base64, # 现在的 logo_base64 已经包含了完整的 data URI 或 URL
             "time": time.strftime("%Y-%m-%d %H:%M:%S"),
         }
         

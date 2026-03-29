@@ -125,11 +125,7 @@
     <div class="container">
         <div class="header">
             {% if logo_base64 %}
-                {% if logo_base64.startswith('http') %}
                 <img src="{{ logo_base64 }}" class="logo">
-                {% else %}
-                <img src="data:image/jpeg;base64,{{ logo_base64 }}" class="logo">
-                {% endif %}
             {% endif %}
             <div class="header-text">
                 <h1>{{ help_title }}</h1>
