@@ -21,38 +21,38 @@ from astrbot.core.star.star_handler import star_handlers_registry, StarHandlerMe
 class MyPlugin(Star):
     # 内置指令文本，带 (admin) 标记的仅管理员可见
     BUILT_IN_COMMANDS_TEXT = textwrap.dedent("""
-        /help : 查看帮助
-        /llm : 开启/关闭 LLM (admin)
-        /plugin : 插件管理 (admin)
-        /plugin ls : 获取已经安装的插件列表 (admin)
-        /plugin off : 禁用插件 (admin)
-        /plugin on : 启用插件 (admin)
-        /plugin get : 安装插件 (admin)
-        /plugin help : 获取插件帮助 (admin)
-        /t2i : 开关文本转图片
-        /tts : 开关文本转语音（会话级别）
-        /sid : 获取会话 ID 和 管理员 ID
-        /op : 授权管理员 (admin)
-        /deop : 取消授权管理员 (admin)
-        /wl : 添加白名单
-        /dwl : 删除白名单 (admin)
-        /provider : 查看或者切换 LLM Provider (admin)
-        /reset : 重置 LLM 会话
-        /stop : 停止当前会话中正在运行的 Agent
-        /model : 查看或者切换模型 (admin)
-        /history : 查看对话记录
-        /ls : 查看对话列表
-        /new : 创建新对话
-        /groupnew : 创建新群聊对话 (admin)
-        /switch : 通过 /ls 前面的序号切换对话
-        /rename : 重命名对话
-        /del : 删除当前对话
-        /key : 查看或者切换 Key (admin)
-        /persona : 查看或者切换 Persona (admin)
-        /dashboard_update : 更新管理面板 (admin)
-        /set : 无描述
-        /unset : 无描述
-        /alter_cmd : 修改命令权限 (admin)
+        help : 查看帮助
+        llm : 开启/关闭 LLM (admin)
+        plugin : 插件管理 (admin)
+        plugin ls : 获取已经安装的插件列表 (admin)
+        plugin off : 禁用插件 (admin)
+        plugin on : 启用插件 (admin)
+        plugin get : 安装插件 (admin)
+        plugin help : 获取插件帮助 (admin)
+        t2i : 开关文本转图片
+        tts : 开关文本转语音（会话级别）
+        sid : 获取会话 ID 和 管理员 ID
+        op : 授权管理员 (admin)
+        deop : 取消授权管理员 (admin)
+        wl : 添加白名单
+        dwl : 删除白名单 (admin)
+        provider : 查看或者切换 LLM Provider (admin)
+        reset : 重置 LLM 会话
+        stop : 停止当前会话中正在运行的 Agent
+        model : 查看或者切换模型 (admin)
+        history : 查看对话记录
+        ls : 查看对话列表
+        new : 创建新对话
+        groupnew : 创建新群聊对话 (admin)
+        switch : 通过 /ls 前面的序号切换对话
+        rename : 重命名对话
+        del : 删除当前对话
+        key : 查看或者切换 Key (admin)
+        persona : 查看或者切换 Persona (admin)
+        dashboard_update : 更新管理面板 (admin)
+        set : 无描述
+        unset : 无描述
+        alter_cmd : 修改命令权限 (admin)
     """).strip()
 
     def __init__(self, context: Context, config: AstrBotConfig):
