@@ -3,7 +3,9 @@ import os
 import base64
 import time
 import textwrap
+import random
 from typing import Dict, List, Optional, Tuple, Any
+from pathlib import Path
 
 
 from astrbot.api.event import filter, AstrMessageEvent
@@ -15,8 +17,39 @@ from astrbot.core.star.filter.command_group import CommandGroupFilter
 from astrbot.core.star.star_handler import star_handlers_registry, StarHandlerMetadata
 
 
+def get_image_data_uri(path_str: str, base_dir: Path, plugin_data_dir: Path, is_user_path: bool = False) -> str:
+    """获取图片的 Data URI。支持 URL, 绝对路径, 以及相对于基础目录和插件数据目录的路径。"""
+    if not path_str:
+        return ""
+    
+    if path_str.startswith(("http://", "https://")):
+        return path_str
+        
+    # 尝试多种可能的路径
+    paths_to_try = [
+        Path(path_str),
+        base_dir / path_str,
+        plugin_data_dir / path_str,
+        Path(__file__).parent / path_str
+    ]
+    
+    for p in paths_to_try:
+        try:
+            if p.is_file():
+                ext = p.suffix.lower().strip(".")
+                mime = f"image/{ext}" if ext in ["png", "jpg", "jpeg", "webp", "gif"] else "image/jpeg"
+                with open(p, "rb") as f:
+                    encoded = base64.b64encode(f.read()).decode("utf-8")
+                    return f"data:{mime};base64,{encoded}"
+        except Exception as e:
+            logger.debug(f"尝试读取图片路径 {p} 失败: {e}")
+            continue
+            
+    return ""
+
+
 @register(
-    "astrbot_plugin_xirohelp", "xiro", "查看所有命令，包括插件，返回一张帮助图片", "1.0.3"
+    "astrbot_plugin_xirohelp", "xiro", "查看所有命令，包括插件，返回一张帮助图片", "1.0.4"
 )
 class MyPlugin(Star):
     # 内置指令文本，带 (admin) 标记的仅管理员可见
@@ -59,7 +92,21 @@ class MyPlugin(Star):
         super().__init__(context)
         self.config = config
         self.logo_path = os.path.join(os.path.dirname(__file__), "astrbot_logo.jpg")
-        self.template_path = os.path.join(os.path.dirname(__file__), "help.html")
+        self.template_path = Path(__file__).parent / "help.html"
+        self.base_dir = Path(os.getcwd())
+        self.plugin_data_dir = Path(self.context.get_data_dir())
+        
+        # 配置校验和初始化
+        bot_name = self.config.get("bot_name")
+        self.bot_name = bot_name if isinstance(bot_name, str) else "AstrBot"
+        
+        help_avatar = self.config.get("help_avatar")
+        if isinstance(help_avatar, list):
+            self.avatar_paths = [str(x) for x in help_avatar if x]
+        elif isinstance(help_avatar, str) and help_avatar:
+            self.avatar_paths = [help_avatar]
+        else:
+            self.avatar_paths = []
 
     @filter.command("helps", alias={"帮助", "菜单", "功能"})
     async def get_help(self, event: AstrMessageEvent):
@@ -94,59 +141,40 @@ class MyPlugin(Star):
                 "commands": [{"name": c, "desc": d} for c, d in cmds]
             })
 
-        # 读取头像并转为 base64
+        # 选择头像
         logo_base64 = ""
-        help_avatar = self.config.get("help_avatar", [])
-        avatar_path = ""
+        if self.avatar_paths:
+            chosen_avatar = random.choice(self.avatar_paths)
+            logo_base64 = get_image_data_uri(chosen_avatar, self.base_dir, self.plugin_data_dir, is_user_path=True)
         
-        if help_avatar:
-            # v4.13.0 的 file 类型返回的是列表
-            avatar_path = help_avatar[0] if isinstance(help_avatar, list) and help_avatar else help_avatar
-            
-        if avatar_path and isinstance(avatar_path, str):
-            if avatar_path.startswith(("http://", "https://")):
-                logo_base64 = avatar_path
-            else:
-                # 尝试多个路径：绝对路径、相对插件目录、相对运行目录
-                paths_to_try = [
-                    avatar_path,
-                    os.path.join(os.path.dirname(__file__), avatar_path),
-                    os.path.abspath(avatar_path)
-                ]
-                for p in paths_to_try:
-                    if os.path.exists(p) and os.path.isfile(p):
-                        with open(p, "rb") as f:
-                            encoded = base64.b64encode(f.read()).decode("utf-8")
-                            ext = os.path.splitext(p)[1].lower().strip(".")
-                            mime = f"image/{ext}" if ext in ["png", "jpg", "jpeg", "webp"] else "image/jpeg"
-                            logo_base64 = f"data:{mime};base64,{encoded}"
-                            break
-        
-        # 如果没有配置头像或读取失败，使用默认 logo
+        # 如果读取失败或未设置，尝试默认 logo
         if not logo_base64 and os.path.exists(self.logo_path):
             with open(self.logo_path, "rb") as f:
                 encoded = base64.b64encode(f.read()).decode("utf-8")
                 logo_base64 = f"data:image/jpeg;base64,{encoded}"
 
         # 读取 HTML 模板
-        with open(self.template_path, "r", encoding="utf-8") as f:
-            template = f.read()
+        try:
+            template = self.template_path.read_text(encoding="utf-8")
+        except Exception as e:
+            logger.error(f"读取模板失败: {e}")
+            yield event.plain_result(f"帮助菜单生成失败，请联系管理员。错误: {e}")
+            return
 
         # 渲染 HTML 转图片
         # 按照文档说明，使用 self.html_render
-        bot_name = self.config.get("bot_name", "AstrBot")
         if is_admin:
-            help_title = f"{bot_name}管理帮助文档"
+            help_title = f"{self.bot_name}管理帮助文档"
             help_subtitle = self.config.get("admin_help_subtitle", "")
         else:
-            help_title = f"{bot_name}帮助文档"
+            help_title = f"{self.bot_name}帮助文档"
             help_subtitle = self.config.get("help_subtitle", "")
 
         render_data = {
             "help_title": help_title,
             "help_subtitle": help_subtitle,
             "plugins": plugins_data,
-            "logo_base64": logo_base64, # 现在的 logo_base64 已经包含了完整的 data URI 或 URL
+            "logo_base64": logo_base64,
             "time": time.strftime("%Y-%m-%d %H:%M:%S"),
         }
         
