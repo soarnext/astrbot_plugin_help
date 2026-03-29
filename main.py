@@ -65,7 +65,8 @@ class MyPlugin(Star):
     @filter.command("helps", alias={"帮助", "菜单", "功能"})
     async def get_help(self, event: AstrMessageEvent):
         """获取普通用户帮助信息"""
-        yield from self._show_help(event, is_admin=False)
+        async for result in self._show_help(event, is_admin=False):
+            yield result
 
     @filter.command("adminhelp", alias={"管理帮助", "后台菜单"})
     async def get_admin_help(self, event: AstrMessageEvent):
@@ -73,7 +74,8 @@ class MyPlugin(Star):
         if not event.is_admin:
             yield event.plain_result("抱歉，此命令仅管理员可用。")
             return
-        yield from self._show_help(event, is_admin=True)
+        async for result in self._show_help(event, is_admin=True):
+            yield result
 
     async def _show_help(self, event: AstrMessageEvent, is_admin: bool):
         """渲染并发送帮助信息"""
