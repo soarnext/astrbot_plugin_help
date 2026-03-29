@@ -16,7 +16,7 @@ from astrbot.core.star.star_handler import star_handlers_registry, StarHandlerMe
 
 
 @register(
-    "astrbot_plugin_help", "xiro", "查看所有命令，包括插件，返回一张帮助图片", "1.0.2"
+    "astrbot_plugin_xirohelp", "xiro", "查看所有命令，包括插件，返回一张帮助图片", "1.0.3"
 )
 class MyPlugin(Star):
     # 内置指令文本，带 (admin) 标记的仅管理员可见
@@ -191,7 +191,7 @@ class MyPlugin(Star):
             plugin_instance = getattr(star, "star_cls", None)
             module_path = getattr(star, "module_path", None)
             
-            if plugin_name in ["astrbot", "astrbot_plugin_help", "astrbot-reminder", "builtin_commands"]:
+            if plugin_name in ["astrbot", "astrbot_plugin_xirohelp", "astrbot-reminder", "builtin_commands"]:
                 continue
                 
             if not plugin_name or not module_path or not isinstance(plugin_instance, Star):

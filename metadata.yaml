@@ -1,6 +1,6 @@
-name: astrbot_plugin_help # 这是你的插件的唯一识别名。
+name: astrbot_plugin_xirohelp # 这是你的插件的唯一识别名。
 display_name: 帮助菜单 # 插件展示名
 desc: 查看所有命令，包括插件，返回一张帮助图片 # 插件简短描述
-version: v1.0.2 # 插件版本号。格式：v1.1.1 或者 v1.1
+version: v1.0.3 # 插件版本号。格式：v1.1.1 或者 v1.1
 author: xiro # 作者
-repo: https://github.com/soarnext/astrbot_plugin_help # 插件的仓库地址
+repo: https://github.com/soarnext/astrbot_plugin_xirohelp # 插件的仓库地址
