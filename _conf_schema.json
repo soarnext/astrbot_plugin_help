@@ -49,5 +49,11 @@
         "hint": "将插件的原始名称映射为自定义显示名称。格式为：'原始插件名: 自定义显示名'，每行一个。例如：'astrbot_plugin_help: 帮助菜单'",
         "type": "list",
         "default": []
+    },
+    "admin_commands": {
+        "description": "管理员指令列表",
+        "hint": "手动指定哪些指令属于管理员指令（不显示在普通帮助中）。填写指令名，如：plugin, llm",
+        "type": "list",
+        "default": ["plugin", "llm", "ascmd", "debug", "conf", "ct", "help", "adminhelps"]
     }
 }

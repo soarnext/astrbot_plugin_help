@@ -162,6 +162,9 @@ class MyPlugin(Star):
         """获取所有其他插件及其命令列表, 格式为 {plugin_name: [command#desc]}"""
         plugin_commands: Dict[str, List[str]] = collections.defaultdict(list)
         
+        # 获取管理员指令设置
+        admin_commands_list = self.config.get("admin_commands", ["plugin", "llm", "ascmd", "debug", "conf", "ct", "help", "adminhelps"])
+        
         # 获取插件显示名称映射
         name_map = {}
         plugin_name_map = self.config.get("plugin_name_map", [])
@@ -207,34 +210,24 @@ class MyPlugin(Star):
                     
                 command_name: Optional[str] = None
                 description: Optional[str] = handler.desc
-                is_admin_cmd = False
                 
                 for filter_ in handler.event_filters:
                     if isinstance(filter_, CommandFilter):
                         command_name = filter_.command_name
                     elif isinstance(filter_, CommandGroupFilter):
                         command_name = filter_.group_name
-                    else:
-                        # 动态判断是否为权限过滤器。
-                        # 在 AstrBot 中，权限过滤器的属性通常包含 permission_type
-                        p_type = getattr(filter_, "permission_type", None)
-                        if p_type is not None and str(p_type).endswith(".ADMIN"):
-                            is_admin_cmd = True
-                        elif hasattr(filter_, "permission_type") and p_type == filter.PermissionType.ADMIN:
-                            is_admin_cmd = True
                         
                 if command_name:
-                    # 如果不是管理员，且描述中包含 (admin)，或者指令本身是管理员权限，则在普通帮助中跳过
-                    is_admin_desc = description and "(admin)" in description
+                    # 严格分离：根据 admin_commands 列表进行手动分类
+                    is_admin_cmd = command_name in admin_commands_list
                     
-                    # 严格分离：普通帮助仅显示普通指令，管理员帮助仅显示管理员指令
                     if is_admin:
-                        # 管理员帮助：仅显示带有管理员标记或权限的指令
-                        if not (is_admin_cmd or is_admin_desc):
+                        # 管理员帮助：仅显示在 admin_commands 列表中的指令
+                        if not is_admin_cmd:
                             continue
                     else:
-                        # 普通帮助：仅显示不带管理员标记或权限的指令
-                        if is_admin_cmd or is_admin_desc:
+                        # 普通帮助：仅显示不在 admin_commands 列表中的指令
+                        if is_admin_cmd:
                             continue
                         
                     formatted_command = f"{command_name}#{description}" if description else command_name
@@ -245,24 +238,15 @@ class MyPlugin(Star):
     def _parse_single_command_list(self, text_list, is_admin: bool = True) -> List[Tuple[str, str | None]]:
         commands = []
         lines = text_list.strip().splitlines() if isinstance(text_list, str) else [ln for ln in text_list if ln.strip()]
+        
+        # 获取管理员指令设置
+        admin_commands_list = self.config.get("admin_commands", ["plugin", "llm", "ascmd", "debug", "conf", "ct", "help", "adminhelps"])
 
         for line in lines:
             raw = line
             stripped = line.strip()
             if not stripped or (stripped.startswith("[") and stripped.endswith("]")):
                 continue
-                
-            # 管理员指令过滤逻辑
-            is_admin_entry = "(admin)" in stripped
-            
-            if is_admin:
-                # 管理员帮助：仅显示管理员指令
-                if not is_admin_entry:
-                    continue
-            else:
-                # 普通用户帮助：仅显示非管理员指令
-                if is_admin_entry:
-                    continue
                 
             if (raw.startswith("  ") or raw.startswith("\t")) and commands:
                 cmd, desc = commands[-1]
@@ -274,15 +258,30 @@ class MyPlugin(Star):
                 if sep in stripped:
                     parts = stripped.split(sep, 1)
                     break
+            
             if parts and len(parts) == 2:
                 cmd = parts[0][2:].strip() if parts[0].startswith("- ") else parts[0].strip()
                 desc = parts[1].strip()
-                # 去掉 desc 中的 (admin) 标记
-                if desc:
-                    desc = desc.replace("(admin)", "").strip()
             else:
                 cmd = stripped[2:].strip() if stripped.startswith("- ") else stripped
                 desc = None
+                
+            # 管理员指令过滤逻辑
+            is_admin_cmd = cmd in admin_commands_list
+            
+            if is_admin:
+                # 管理员帮助：仅显示管理员指令
+                if not is_admin_cmd:
+                    continue
+            else:
+                # 普通用户帮助：仅显示非管理员指令
+                if is_admin_cmd:
+                    continue
+            
+            # 去掉 desc 中的 (admin) 标记（如果存在）
+            if desc:
+                desc = desc.replace("(admin)", "").strip()
+                
             commands.append((cmd, desc))
 
         return [(c, (d.splitlines()[0].strip() if d else None)) for c, d in commands]
