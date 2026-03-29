@@ -67,7 +67,7 @@ class MyPlugin(Star):
         async for result in self._show_help(event, is_admin=False):
             yield result
 
-    @filter.command("adminhelp", alias={"管理帮助", "后台菜单"})
+    @filter.command("adminhelps", alias={"管理帮助", "后台菜单", "管理菜单"})
     async def get_admin_help(self, event: AstrMessageEvent):
         """获取管理员帮助信息"""
         if not event.is_admin:
