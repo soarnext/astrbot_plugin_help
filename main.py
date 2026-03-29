@@ -12,7 +12,6 @@ from astrbot.api import logger
 from astrbot.core.config.astrbot_config import AstrBotConfig
 from astrbot.core.star.filter.command import CommandFilter
 from astrbot.core.star.filter.command_group import CommandGroupFilter
-from astrbot.core.star.filter.permission import PermissionFilter
 from astrbot.core.star.star_handler import star_handlers_registry, StarHandlerMetadata
 
 
@@ -215,9 +214,13 @@ class MyPlugin(Star):
                         command_name = filter_.command_name
                     elif isinstance(filter_, CommandGroupFilter):
                         command_name = filter_.group_name
-                    elif isinstance(filter_, PermissionFilter):
-                        # 判断是否包含 ADMIN 权限。filter.PermissionType.ADMIN 是 Enum
-                        if filter_.permission_type == filter.PermissionType.ADMIN:
+                    else:
+                        # 动态判断是否为权限过滤器。
+                        # 在 AstrBot 中，权限过滤器的属性通常包含 permission_type
+                        p_type = getattr(filter_, "permission_type", None)
+                        if p_type is not None and str(p_type).endswith(".ADMIN"):
+                            is_admin_cmd = True
+                        elif hasattr(filter_, "permission_type") and p_type == filter.PermissionType.ADMIN:
                             is_admin_cmd = True
                         
                 if command_name:
